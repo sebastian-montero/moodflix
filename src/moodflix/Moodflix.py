@@ -115,6 +115,10 @@ class Main:
                                 st.markdown(f"""**Rating:** {vote_average}/10  \n**Genres:** {genres}""")
                             st.markdown("")
         st.markdown("###### Created by [Sebastian Montero](http://www.sebastianmontero.com/)")
-            
+        st.markdown("""#MainMenu {
+  visibility: hidden;
+}
+""", unsafe_allow_html=True)
+
 if __name__ == "__main__":
     Main.render()
