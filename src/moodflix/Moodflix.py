@@ -6,6 +6,19 @@ import hnswlib
 import json 
 import logging
 
+def init_logging():
+    logger = logging.getLogger("custom")
+    if logger.handlers: 
+        return
+    logger.propagate = False
+    logger.setLevel(logging.INFO)
+    formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s - %(message)s")
+    handler = logging.StreamHandler()
+    handler.setLevel(logging.INFO)
+    handler.addFilter(ContextFilter())
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
 LOGGER = logging.getLogger("custom")
 
 st.set_page_config(page_title="Moodflix", page_icon="🍿", layout="centered", menu_items={
