@@ -99,9 +99,9 @@ class Main:
                 random_mood = random.choice(MOODS)
 
         st.session_state.mood = st.text_area("enter_mood", label_visibility="collapsed", value=random_mood)
-        print(st.session_state.mood)
 
         if st.session_state.mood != "":
+            print(st.session_state.mood)
             with st.spinner("🍿"):
                 embeddings = MODEL.encode([st.session_state['mood']])[0]
                 labels, distances = INDEX.knn_query(embeddings, k=st.session_state.k)
