@@ -4,14 +4,20 @@ import random
 from sentence_transformers import SentenceTransformer
 import hnswlib
 import json 
+
+hide = """
+#GithubIcon {
+  visibility: hidden;
+}
+"""
+st.markdown(hide, unsafe_allow_html=True)
+
+
 st.set_page_config(page_title="Moodflix", page_icon="🍿", layout="centered", menu_items={
         'Report a bug': "https://github.com/sebastian-montero/moodflix/issues",
         'About': "Built by Sebastian Montero to try and stop endless discussions about what movie to watch."
     })
 
-st.markdown("""#MainMenu {
-visibility: hidden;
-}""", unsafe_allow_html=True)
 
 
 MOODS = [
