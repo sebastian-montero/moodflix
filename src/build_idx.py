@@ -13,7 +13,7 @@ def main():
     movie_objs = {}
     all_embeddings = []
     ids = []
-    for i in tqdm(movies.to_dict('records')[0:1000]):
+    for i in tqdm(movies.to_dict('records')):
         ids.append(i['id'])
         title = i['title']
         genres = ast.literal_eval(i['genres'])
