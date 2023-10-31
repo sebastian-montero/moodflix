@@ -121,14 +121,19 @@ class Main:
                         overview = movie_data["overview"]
                         vote_average = float(movie_data["vote_average"])
                         release_date = int(movie_data["release_date"][0:4])
-                        if len(set(genre_filter).intersection(set(movie_data["genres"]))) > 0 and vote_average >= ranking_filter[0] and vote_average <= ranking_filter[1]:
-                            st.markdown(f"##### {title} ({release_date})")
-                            mov1, mov2 = st.columns([3,1])
-                            with mov1:
-                                st.markdown(f"**Plot synopsis:** {overview}")
-                            with mov2:
-                                st.markdown(f"""**Rating:** {vote_average}/10  \n**Genres:** {genres}""")
-                            st.markdown("")
+
+                        len_movie_genre = len([x for x in movie_data["genres"] if x in all_genres])
+                        len_filtered_genres = len([x for x in movie_data["genres"] if x in genre_filter])
+
+                        if vote_average >= ranking_filter[0] and vote_average <= ranking_filter[1]:
+                                if len_filtered_genres == len_movie_genre:
+                                    st.markdown(f"##### {title} ({release_date})")
+                                    mov1, mov2 = st.columns([3,1])
+                                    with mov1:
+                                        st.markdown(f"**Plot synopsis:** {overview}")
+                                    with mov2:
+                                        st.markdown(f"""**Rating:** {vote_average}/10  \n**Genres:** {genres}""")
+                                    st.markdown("")
         st.markdown("###### Created by [Sebastian Montero](http://www.sebastianmontero.com/)")
 
 
