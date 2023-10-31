@@ -16,6 +16,9 @@ st.markdown(
 <style>
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
+#GithubIcon {
+  visibility: hidden;
+}
 </style>
 
 """,
