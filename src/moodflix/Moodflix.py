@@ -1,11 +1,10 @@
 import streamlit as st
 from moodflix.components.header import header
 import random
-import time
 from sentence_transformers import SentenceTransformer
 import hnswlib
 import json 
-st.set_page_config(page_title="Moodflix", page_icon="🍿", layout="wide", initial_sidebar_state='collapsed')
+st.set_page_config(page_title="Moodflix", page_icon="🍿", layout="centered")
 
 
 MOODS = [
@@ -54,6 +53,7 @@ def load_model():
 INDEX = load_index()
 MOVIE_DATA = load_data()
 MODEL = load_model()
+
 class Main:
     @staticmethod
     def render():
@@ -61,36 +61,41 @@ class Main:
 
         with st.sidebar:
             st.markdown(ABOUT)
-        with st.columns([2,2,2])[1]:
-            c1, c2 = st.columns([7, 1], gap="large")
-            with c1:
-                st.markdown("##### What are you in the mood for?")
-            with c2:
-                if "mood" not in st.session_state:
-                    st.session_state.mood = ""
-                    
-                if st.session_state.mood == "":
-                    random_mood = ""
-                else:
-                    random_mood = st.session_state.mood
-    
-                if st.button("🎲"):
-                    random_mood = random.choice(MOODS)
+            with st.expander("Additional parameters", expanded=False):
+                if "k" not in st.session_state:
+                    st.session_state.k = 50
+                st.session_state.k = st.slider("Number of movies", min_value=1, max_value=200, value=st.session_state.k, step=1)
 
-            st.session_state.mood = st.text_area("enter_mood", label_visibility="collapsed", value=random_mood)
+        c1, c2 = st.columns([8, 1], gap="small")
+        with c1:
+            st.markdown("#### What are you in the mood for?")
+        with c2:
+            if "mood" not in st.session_state:
+                st.session_state.mood = ""
+                
+            if st.session_state.mood == "":
+                random_mood = ""
+            else:
+                random_mood = st.session_state.mood
+            if st.button("🎲"):
+                random_mood = random.choice(MOODS)
 
-            if st.session_state.mood != "":
-                with st.spinner("🍿"):
-                    embeddings = MODEL.encode([st.session_state['mood']])[0]
-                    labels, distances = INDEX.knn_query(embeddings, k=50)
-                    all_genres = [MOVIE_DATA[str(i)]["genres"] for i in labels[0]]
-                    all_genres = [item for sublist in all_genres for item in sublist]
-              
-                    with st.expander(f"Genre filters", expanded=False):
-                        genre_filter = st.multiselect("Genres", options=list(set(all_genres)), default=list(set(all_genres)), label_visibility="collapsed")
-             
-                    st.markdown("##### Here are some movies you might like:")
-                    for label, d in zip(labels[0], distances[0]):
+        st.session_state.mood = st.text_area("enter_mood", label_visibility="collapsed", value=random_mood)
+
+        if st.session_state.mood != "":
+            with st.spinner("🍿"):
+                embeddings = MODEL.encode([st.session_state['mood']])[0]
+                labels, distances = INDEX.knn_query(embeddings, k=st.session_state.k)
+                all_genres = [MOVIE_DATA[str(i)]["genres"] for i in labels[0]]
+                all_genres = [item for sublist in all_genres for item in sublist]
+        
+                with st.expander(f"Filters", expanded=False):
+                    genre_filter = st.multiselect("Genres", options=list(set(all_genres)), default=list(set(all_genres)))
+                    ranking_filter = st.slider("Rating", min_value=0, max_value=10, value=(0,10), step=1)
+            
+                st.markdown("#### Here are some movies you might like:")
+                for label, d in zip(labels[0], distances[0]):
+                    if isinstance(MOVIE_DATA[str(label)]["overview"],str):
                         d = int(d*100)/100
                         movie_data = MOVIE_DATA[str(label)]
                         title = movie_data["name"]
@@ -98,16 +103,15 @@ class Main:
                         overview = movie_data["overview"]
                         vote_average = float(movie_data["vote_average"])
                         release_date = int(movie_data["release_date"][0:4])
-
-                        if len(set(genre_filter).intersection(set(movie_data["genres"]))) > 0:
-                            with st.expander(f"{title} ({release_date})", expanded=False):
-                                mov1, mov2 = st.columns([2,1])
-                                with mov1:
-                                    st.markdown(overview)
-                                with mov2:
-                                    st.markdown(f"**Genres:** {genres}")
-                                    st.markdown(f"**Rating:** {vote_average}/10")
-            st.markdown("###### Created by [Sebastian Montero](http://www.sebastianmontero.com/)")
+                        if len(set(genre_filter).intersection(set(movie_data["genres"]))) > 0 and vote_average >= ranking_filter[0] and vote_average <= ranking_filter[1]:
+                            st.markdown(f"##### {title} ({release_date})")
+                            mov1, mov2 = st.columns([3,1])
+                            with mov1:
+                                st.markdown(f"**Plot synopsis:** {overview}")
+                            with mov2:
+                                st.markdown(f"""**Rating:** {vote_average}/10  \n**Genres:** {genres}""")
+                            st.markdown("")
+        st.markdown("###### Created by [Sebastian Montero](http://www.sebastianmontero.com/)")
             
 if __name__ == "__main__":
     Main.render()
