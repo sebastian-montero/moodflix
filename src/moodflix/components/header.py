@@ -12,5 +12,5 @@ def img_to_html(img_path):
 
 def header(title):
         st.markdown(f"<h1 style='text-align: center;'>{title}</h1>", unsafe_allow_html=True)
-        st.columns([1,3,1])[1].markdown("<h3 style='text-align: center;'>A movie recommendation engine based on your mood.</h3>", unsafe_allow_html=True)
+        st.columns([1,3,1])[1].markdown("<h3 style='text-align: center;'>A movie recommendation engine in tune with your mood.</h3>", unsafe_allow_html=True)
         st.markdown(f"<p style='text-align: center;'>{img_to_html('img/pop.PNG')}</p>", unsafe_allow_html=True)
