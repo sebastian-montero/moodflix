@@ -4,7 +4,9 @@ import random
 from sentence_transformers import SentenceTransformer
 import hnswlib
 import json 
+import logging
 
+LOGGER = logging.getLogger("custom")
 
 st.set_page_config(page_title="Moodflix", page_icon="🍿", layout="centered", menu_items={
         'Report a bug': "https://github.com/sebastian-montero/moodflix/issues",
@@ -101,7 +103,7 @@ class Main:
         st.session_state.mood = st.text_area("enter_mood", label_visibility="collapsed", value=random_mood)
 
         if st.session_state.mood != "":
-            print(st.session_state.mood)
+            LOGGER.info(f"user prompt: {st.session_state.mood}")
             with st.spinner("🍿"):
                 embeddings = MODEL.encode([st.session_state['mood']])[0]
                 labels, distances = INDEX.knn_query(embeddings, k=st.session_state.k)
