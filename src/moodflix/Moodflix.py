@@ -11,19 +11,18 @@ st.set_page_config(page_title="Moodflix", page_icon="🍿", layout="centered", m
         'About': "Built by Sebastian Montero to try and stop endless discussions about what movie to watch."
     })
 
-st.markdown(
-"""
-<style>
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
-#GithubIcon {
-  visibility: hidden;
-}
-</style>
-
-""",
-    unsafe_allow_html=True
-)
+# st.markdown(
+# """
+# <style>
+# #MainMenu {visibility: hidden;}
+# footer {visibility: hidden;}
+# #GithubIcon {
+#   visibility: hidden;
+# }
+# </style>
+# """,
+#     unsafe_allow_html=True
+# )
 
 
 MOODS = [
