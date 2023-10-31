@@ -9,6 +9,10 @@ st.set_page_config(page_title="Moodflix", page_icon="🍿", layout="centered", m
         'About': "Built by Sebastian Montero to try and stop endless discussions about what movie to watch."
     })
 
+st.markdown("""#MainMenu {
+visibility: hidden;
+}""", unsafe_allow_html=True)
+
 
 MOODS = [
     "cold autumn day, seeking a film to warm the heart with my loved ones",
@@ -115,10 +119,7 @@ class Main:
                                 st.markdown(f"""**Rating:** {vote_average}/10  \n**Genres:** {genres}""")
                             st.markdown("")
         st.markdown("###### Created by [Sebastian Montero](http://www.sebastianmontero.com/)")
-        st.markdown("""#MainMenu {
-  visibility: hidden;
-}
-""", unsafe_allow_html=True)
+
 
 if __name__ == "__main__":
     Main.render()
