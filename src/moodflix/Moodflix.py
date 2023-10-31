@@ -7,12 +7,6 @@ import hnswlib
 import json 
 st.set_page_config(page_title="Moodflix", page_icon="🍿", layout="wide", initial_sidebar_state='collapsed')
 
-MODEL = SentenceTransformer('sentence-transformers/sentence-t5-base')
-
-INDEX = hnswlib.Index(space='cosine', dim=768)
-INDEX.load_index("idx.bin")
-
-MOVIE_DATA = json.load(open("movie_objs.json", "r"))
 
 MOODS = [
     "cold autumn day, seeking a film to warm the heart with my loved ones",
@@ -26,15 +20,7 @@ MOODS = [
     "lazy sunday afternoon, wanting a family or animated movie",
     "clear starry night, up for a sci-fi or otherworldly journey"
 ]
-
-
-class Main:
-    @staticmethod
-    def render():
-        header("Moodflix 🍿")
-
-        with st.sidebar:
-            st.markdown("""# About
+ABOUT = """# About
 Ever had one of those days where you're thinking, "I'm feeling so blue, a rom-com is just the thing," or "I'm on top of the world, bring on the action"? Well, Moodflix is here to save your movie night. 
 Get tailored recommendations based on your current feels. Say goodbye to endless scrolling and hello to the ideal movie match. 
 Whether you're in the mood for some drama, thrills, or romance, Moodflix is your new best cinema friend. Let's get those movie vibes going!
@@ -48,8 +34,33 @@ So, taking a cue from Viberary, Moodflix was born, aiming to match movies with m
 ## The Data
 The dataset provides metadata about the top 10,000 movies from **The Movie Database (TMDB)**. Encompassing a diverse set of attributes, details such as movie titles, release dates, runtime, genres, production companies, budget, and revenue are included. Key attributes highlighted are the unique identifier (`id`), movie title (`title`), associated genres (`genres`), the original production language (`original_language`), average user rating (`vote_average`), a popularity score based on user engagement (`popularity`), a brief synopsis (`overview`), the production budget in USD (`budget`), the movie's total revenue in USD (`revenue`), the movie's duration in minutes (`runtime`), and its promotional tagline (`tagline`). This data, sourced from TMDB, was retrieved from Kaggle and has been processed for enhanced quality and usability.
 
-**Source:** [Top 10000 popular Movies TMDB](#https://www.kaggle.com/datasets/ursmaheshj/top-10000-popular-movies-tmdb-05-2023)
-""")
+**Source:** [Top 10000 popular Movies TMDB](#https://www.kaggle.com/datasets/ursmaheshj/top-10000-popular-movies-tmdb-05-2023)"""
+
+
+@st.cache_resource
+def load_index():
+    idx = hnswlib.Index(space='cosine', dim=768)
+    idx.load_index("idx.bin")
+    return idx
+
+@st.cache_data
+def load_data():
+    return json.load(open("movie_objs.json", "r"))
+
+@st.cache_resource
+def load_model():
+    return SentenceTransformer('sentence-transformers/sentence-t5-base')
+
+INDEX = load_index()
+MOVIE_DATA = load_data()
+MODEL = load_model()
+class Main:
+    @staticmethod
+    def render():
+        header("Moodflix 🍿")
+
+        with st.sidebar:
+            st.markdown(ABOUT)
         with st.columns([2,2,2])[1]:
             c1, c2 = st.columns([7, 1], gap="large")
             with c1:
@@ -71,7 +82,7 @@ The dataset provides metadata about the top 10,000 movies from **The Movie Datab
             if st.session_state.mood != "":
                 with st.spinner("🍿"):
                     embeddings = MODEL.encode([st.session_state['mood']])[0]
-                    labels, distances = INDEX.knn_query(embeddings, k=20)
+                    labels, distances = INDEX.knn_query(embeddings, k=50)
                     all_genres = [MOVIE_DATA[str(i)]["genres"] for i in labels[0]]
                     all_genres = [item for sublist in all_genres for item in sublist]
               
