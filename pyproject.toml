@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "moodflix"
+version = "0.1.0"
+description = "Data app to search movies based on your mood."
+authors = ["Sebastian Montero <smonteroparis@icloud.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.9.7 || >3.9.7,<3.13"
+streamlit = "^1.28.0"
+pandas = "^2.1.2"
+tqdm = "^4.66.1"
+hnswlib = "^0.7.0"
+sentence-transformers = "^2.2.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
