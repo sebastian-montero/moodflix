@@ -3,5 +3,5 @@ from sentence_transformers import SentenceTransformer
 
 def sentence_transformer():
     """Loads the model"""
-    model_name = open("model.txt").readlines()[0]
+    model_name = "sentence-transformers/sentence-t5-large"
     return SentenceTransformer(model_name)
