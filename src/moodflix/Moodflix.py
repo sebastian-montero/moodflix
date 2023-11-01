@@ -35,7 +35,7 @@ class Main:
     def render():
         """Renders the app"""
         st.markdown(center_html("p", img_to_html("im_logo.png", 300)), unsafe_allow_html=True)
-        st.columns([1, 3, 1])[1].markdown(center_html("h3", "A movie recommendation engine in tune with your mood 🍿"), unsafe_allow_html=True)
+        st.columns([1, 3, 1])[1].markdown(center_html("h3", "A movie recommendation engine in tune with your mood."), unsafe_allow_html=True)
 
         with st.sidebar:
             st.markdown(center_html("p", img_to_html("im_pop.png", 125)), unsafe_allow_html=True)
@@ -96,7 +96,7 @@ class Main:
                         genre_bool = len_filtered_genres == len_movie_genre if genre_excluded else len_filtered_genres > 0
 
                         if (ranking_filter[0] <= vote_average <= ranking_filter[1]) and genre_bool:
-                            st.markdown(f"##### {title} ({release_date})")
+                            st.markdown(f"##### 🍿  {title} ({release_date})")
                             movie_column1, movie_column2 = st.columns([3, 1.5])
                             with movie_column1:
                                 st.markdown(f"**Plot synopsis:** {overview}")
