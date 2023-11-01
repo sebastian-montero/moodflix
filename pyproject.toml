@@ -13,6 +13,8 @@ tqdm = "^4.66.1"
 hnswlib = "^0.7.0"
 sentence-transformers = "^2.2.2"
 torch = ">=2.0.0, !=2.0.1, !=2.1.0"
+pre-commit = "^3.5.0"
+tomli = "^2.0.1"
 
 [build-system]
 requires = ["poetry-core"]

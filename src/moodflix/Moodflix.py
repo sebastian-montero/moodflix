@@ -1,141 +1,60 @@
-import streamlit as st
-from moodflix.components.header import header, img_to_html
 import random
-from sentence_transformers import SentenceTransformer
-import hnswlib
-import json 
-import logging
+from dataclasses import dataclass
 
-def init_logging():
-    logger = logging.getLogger("custom")
-    if logger.handlers: 
-        return
-    logger.propagate = False
-    logger.setLevel(logging.INFO)
-    formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s - %(message)s")
-    handler = logging.StreamHandler()
-    handler.setLevel(logging.INFO)
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
+import streamlit as st
 
-LOGGER = logging.getLogger("custom")
+from moodflix.caches import load_data, load_index, load_model
+from moodflix.extras import load_extra_html
+from moodflix.text import ABOUT, MOODS
+from moodflix.utils import center_html, img_to_html
 
-st.set_page_config(page_title="Moodflix", page_icon="🍿", layout="centered", menu_items={
-        'Report a bug': "https://github.com/sebastian-montero/moodflix/issues",
-        'About': "Built by Sebastian Montero to try and stop endless discussions about what movie to watch."
-    })
+st.set_page_config(page_title="Moodflix", page_icon="🍿", layout="centered")
 
-st.markdown(
-"""
-<style>
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
-#GithubIcon {
-  visibility: hidden;
-}
-</style>
-""",
-    unsafe_allow_html=True
-)
+load_extra_html()
 
 
-MOODS = [
-    "cold autumn day, seeking a film to warm the heart with my loved ones",
-    "bright summer morning, in the mood for an adventure flick",
-    "rainy afternoon, longing for a deep mystery or drama",
-    "lively spring evening, craving a dance or musical film",
-    "quiet winter night, ready for a classic or a heartfelt story",
-    "sunny day, desiring a light-hearted comedy or romance",
-    "misty dawn, setting the scene for a fantasy or epic tale",
-    "back from the city, feeling a noir or thriller vibe",
-    "lazy sunday afternoon, wanting a family or animated movie",
-    "clear starry night, up for a sci-fi or otherworldly journey",
-    "feeling the need for some old-school classics",
-    "hoping for heartwarming tales with family",
-    "seeking an edge-of-the-seat thriller night",
-    "craving feel-good comedies and chuckles",
-    "desiring epic adventures with grand battles",
-    "looking for tales of star-crossed lovers",
-    "intrigued by mysteries and detective sagas",
-    "yearning for musicals with catchy tunes",
-    "eager for animation and childhood wonders",
-    "wanting a dive into deep, thought-provoking drama",
-    "hankering for spine-chilling horror stories",
-    "in the mood for travel and scenic world explorations"
-]
-ABOUT = """# About
-Ever had one of those days where you're thinking, "I'm feeling so blue, a rom-com is just the thing," or "I'm on top of the world, bring on the action"? Well, Moodflix is here to save your movie night. 
-Get tailored recommendations based on your current feels. Say goodbye to endless scrolling and hello to the ideal movie match. 
-Whether you're in the mood for some drama, thrills, or romance, Moodflix is your new best cinema friend. Let's get those movie vibes going!
+@dataclass
+class Movie:
+    """Movie class"""
 
-## Inspiration
-The idea behind Moodflix was sparked by the [Viberary](http://viberary.pizza) website, created by [@vboykis](https://twitter.com/vboykis). 
-Viberary uses a similar approach of suggesting books based on the user's vibes. Seeing its potential, I felt a similar concept could be applied to movies. 
-So, taking a cue from Viberary, Moodflix was born, aiming to match movies with moods for a tailored viewing experience.
+    id: int  # pylint: disable=invalid-name
+    name: str
+    release_date: str
+    overview: str
+    tagline: str
+    vote_average: float
+    genres: list
 
-## The Data
-The dataset provides metadata about the top 10,000 movies from **The Movie Database (TMDB)**. Encompassing a diverse set of attributes, details such as movie titles, release dates, runtime, genres, production companies, budget, and revenue are included. Key attributes highlighted are the unique identifier (`id`), movie title (`title`), associated genres (`genres`), the original production language (`original_language`), average user rating (`vote_average`), a popularity score based on user engagement (`popularity`), a brief synopsis (`overview`), the production budget in USD (`budget`), the movie's total revenue in USD (`revenue`), the movie's duration in minutes (`runtime`), and its promotional tagline (`tagline`). This data, sourced from TMDB, was retrieved from Kaggle and has been processed for enhanced quality and usability.
-
-**Source:** [Top 10000 popular Movies TMDB](#https://www.kaggle.com/datasets/ursmaheshj/top-10000-popular-movies-tmdb-05-2023)
-
-## Indexing the movies
-The ingestion pipelines processes the data and prepares it for similarity-based recommendations. 
-It utilizes the `sentence-t5-base` model from SentenceTransformers to convert textual information from movie titles, genres, overviews, and taglines into numerical embeddings. 
-These embeddings serve as condensed representations, capturing the content nuances of each film, facilitating efficient similarity comparisons.
-
-To enable rapid similarity searches, the we use the `hnswlib` library to create a search index based on the HNSW (Hierarchical Navigable Small World) algorithm. 
-This indexing approach ensures fast and accurate retrieval, making it suitable for real-time movie recommendations. 
-Once processed, the structured movie details are stored, and the search index is saved, paving the way for subsequent recommendation operations.
-
-## Searching for similar movies
-Upon receiving the user's mood input, we encode the text into a numerical vector embedding. 
-This embedding is essentially a dense vector that captures the essence of the user's mood in a format conducive to similarity comparisons. 
-The generated embedding is then used as a search query in the `hnswlib` index to perform a k-nearest neighbors search. 
-This search retrieves movies with embeddings that are most similar to the mood embedding, ensuring that the movies align closely with the user's specified mood.
-"""
-
-
-
-@st.cache_resource
-def load_index():
-    idx = hnswlib.Index(space='cosine', dim=768)
-    idx.load_index("idx.bin")
-    idx.set_ef(1000)
-    return idx
-
-@st.cache_data
-def load_data():
-    return json.load(open("movie_objs.json", "r"))
-
-@st.cache_resource
-def load_model():
-    return SentenceTransformer('sentence-transformers/sentence-t5-base')
-
-INDEX = load_index()
-MOVIE_DATA = load_data()
-MODEL = load_model()
 
 class Main:
+    """Main class for the app"""
+
+    # pylint: disable=too-many-locals,too-many-statements
     @staticmethod
     def render():
-        header("Moodflix")
+        """Renders the app"""
+        st.markdown(center_html("p", img_to_html("img/logo.png", 300)), unsafe_allow_html=True)
+        st.columns([1, 3, 1])[1].markdown(center_html("h3", "A movie recommendation engine in tune with your mood 🍿"), unsafe_allow_html=True)
 
         with st.sidebar:
-            st.markdown(f"<p style='text-align: center;'>{img_to_html('img/pop.png', 200)}</p>", unsafe_allow_html=True)
+            st.markdown(center_html("p", img_to_html("img/pop.png", 200)), unsafe_allow_html=True)
             st.markdown(ABOUT)
-            st.markdown("## Extras")
             with st.expander("Additional parameters", expanded=False):
                 if "k" not in st.session_state:
                     st.session_state.k = 50
-                st.session_state.k = st.number_input("Approximate nearest neighbours to search", min_value=1, max_value=200, value=st.session_state.k, step=1)
+                st.session_state.k = st.number_input("Approximate nearest neighbours to search", min_value=5, max_value=200, value=st.session_state.k, step=10)
 
-        c1, c2 = st.columns([9, 1], gap="small")
-        with c1:
+        index = load_index()
+        movies = load_data()
+        model = load_model()
+
+        column1, column2 = st.columns([9, 1], gap="small")
+        with column1:
             st.markdown("#### What do you feel like?")
-        with c2:
+        with column2:
             if "mood" not in st.session_state:
                 st.session_state.mood = ""
-                
+
             if st.session_state.mood == "":
                 random_mood = ""
             else:
@@ -146,44 +65,45 @@ class Main:
         st.session_state.mood = st.text_area("enter_mood", label_visibility="collapsed", value=random_mood, placeholder="click 🎲 to get a random mood", height=50)
 
         if st.session_state.mood != "":
-            LOGGER.info(f"user prompt: {st.session_state.mood}")
             with st.spinner("🍿"):
-                embeddings = MODEL.encode([st.session_state['mood']])[0]
-                labels, distances = INDEX.knn_query(embeddings, k=st.session_state.k)
-                all_genres = [MOVIE_DATA[str(i)]["genres"] for i in labels[0]]
-                all_genres = [item for sublist in all_genres for item in sublist]
-        
-                with st.expander(f"Filters", expanded=False):
-                    genre_filter = st.multiselect("Genres", options=list(set(all_genres)), default=list(set(all_genres)))
-                    genre_excluded = st.toggle('Hard exclude', value=True)
-                    ranking_filter = st.slider("Rating", min_value=0, max_value=10, value=(0,10), step=1)
+                embeddings = model.encode([st.session_state["mood"]])[0]
+                movie_ids, _ = index.knn_query(embeddings, k=st.session_state.k)
+                movie_ids = [str(i) for i in movie_ids[0]]
+
+                all_genres = {j for s in [movies[i]["genres"] for i in movie_ids] for j in s}
+
+                with st.expander("Filters", expanded=False):
+                    genre_filter = st.multiselect("Genres", options=all_genres, default=all_genres)
+                    genre_excluded = st.toggle("Hard exclude", value=True)
+                    ranking_filter = st.slider("Rating", min_value=0, max_value=10, value=(0, 10), step=1)
 
                 st.markdown("#### Here's what we recommend:")
-                for label, d in zip(labels[0], distances[0]):
-                    if isinstance(MOVIE_DATA[str(label)]["overview"],str):
-                        d = int(d*100)/100
-                        movie_data = MOVIE_DATA[str(label)]
-                        title = movie_data["name"]
-                        genres = ", ".join(movie_data["genres"])
-                        overview = movie_data["overview"]
-                        vote_average = float(movie_data["vote_average"])
-                        release_date = int(movie_data["release_date"][0:4]) if isinstance(movie_data["release_date"], str) else "N/A"
+                st.markdown("")
+                for movie_id in movie_ids:
+                    movie = Movie(**movies[str(movie_id)])
 
-                        len_movie_genre = len([x for x in movie_data["genres"] if x in all_genres])
-                        len_filtered_genres = len([x for x in movie_data["genres"] if x in genre_filter])
+                    if isinstance(movie.overview, str):
+                        title = movie.name
+                        overview = movie.overview
+                        vote_average = movie.vote_average
+                        release_date = int(movie.release_date[0:4]) if isinstance(movie.release_date, str) else "N/A"
+
+                        len_movie_genre = len([x for x in movie.genres if x in all_genres])
+                        len_filtered_genres = len([x for x in movie.genres if x in genre_filter])
 
                         genre_bool = len_filtered_genres == len_movie_genre if genre_excluded else len_filtered_genres > 0
 
-                        if vote_average >= ranking_filter[0] and vote_average <= ranking_filter[1]:
-                                if genre_bool:
-                                    st.markdown(f"##### {title} ({release_date})")
-                                    mov1, mov2 = st.columns([3,1])
-                                    with mov1:
-                                        st.markdown(f"**Plot synopsis:** {overview}")
-                                    with mov2:
-                                        st.markdown(f"""**Rating:** {vote_average}/10  \n**Genres:** {genres}""")
-                                    st.markdown("")
-        st.markdown("**Created by [Sebastian Montero](http://www.sebastianmontero.com/)**")
+                        if (ranking_filter[0] <= vote_average <= ranking_filter[1]) and genre_bool:
+                            st.markdown(f"##### {title} ({release_date})")
+                            movie_column1, movie_column2 = st.columns([3, 1.5])
+                            with movie_column1:
+                                st.markdown(f"**Plot synopsis:** {overview}")
+                            with movie_column2:
+                                genres_str = ", ".join(movie.genres)
+                                st.markdown(f"""**Rating:** {vote_average}/10  \n**Genres:** {genres_str}""")
+                            st.divider()
+
+        st.markdown(center_html("p", "Created by <a href=https://twitter.com/sebastianmxnt>Sebastian Montero</a>"), unsafe_allow_html=True)
 
 
 if __name__ == "__main__":
