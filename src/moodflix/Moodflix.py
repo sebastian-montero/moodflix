@@ -1,5 +1,5 @@
 import streamlit as st
-from moodflix.components.header import header
+from moodflix.components.header import header, img_to_html
 import random
 from sentence_transformers import SentenceTransformer
 import hnswlib
@@ -118,9 +118,10 @@ MODEL = load_model()
 class Main:
     @staticmethod
     def render():
-        header("Moodflix 🍿")
+        header("Moodflix")
 
         with st.sidebar:
+            st.markdown(f"<p style='text-align: center;'>{img_to_html('img/pop.png', 200)}</p>", unsafe_allow_html=True)
             st.markdown(ABOUT)
             st.markdown("## Extras")
             with st.expander("Additional parameters", expanded=False):
@@ -128,7 +129,7 @@ class Main:
                     st.session_state.k = 50
                 st.session_state.k = st.number_input("Approximate nearest neighbours to search", min_value=1, max_value=200, value=st.session_state.k, step=1)
 
-        c1, c2 = st.columns([8, 1], gap="small")
+        c1, c2 = st.columns([9, 1], gap="small")
         with c1:
             st.markdown("#### What do you feel like?")
         with c2:
@@ -142,7 +143,7 @@ class Main:
             if st.button("🎲"):
                 random_mood = random.choice(MOODS)
 
-        st.session_state.mood = st.text_input("enter_mood", label_visibility="collapsed", value=random_mood)
+        st.session_state.mood = st.text_area("enter_mood", label_visibility="collapsed", value=random_mood, placeholder="click 🎲 to get a random mood", height=50)
 
         if st.session_state.mood != "":
             LOGGER.info(f"user prompt: {st.session_state.mood}")
@@ -154,8 +155,9 @@ class Main:
         
                 with st.expander(f"Filters", expanded=False):
                     genre_filter = st.multiselect("Genres", options=list(set(all_genres)), default=list(set(all_genres)))
+                    genre_excluded = st.toggle('Hard exclude', value=True)
                     ranking_filter = st.slider("Rating", min_value=0, max_value=10, value=(0,10), step=1)
-            
+
                 st.markdown("#### Here's what we recommend:")
                 for label, d in zip(labels[0], distances[0]):
                     if isinstance(MOVIE_DATA[str(label)]["overview"],str):
@@ -170,8 +172,10 @@ class Main:
                         len_movie_genre = len([x for x in movie_data["genres"] if x in all_genres])
                         len_filtered_genres = len([x for x in movie_data["genres"] if x in genre_filter])
 
+                        genre_bool = len_filtered_genres == len_movie_genre if genre_excluded else len_filtered_genres > 0
+
                         if vote_average >= ranking_filter[0] and vote_average <= ranking_filter[1]:
-                                if len_filtered_genres == len_movie_genre:
+                                if genre_bool:
                                     st.markdown(f"##### {title} ({release_date})")
                                     mov1, mov2 = st.columns([3,1])
                                     with mov1:
@@ -179,7 +183,7 @@ class Main:
                                     with mov2:
                                         st.markdown(f"""**Rating:** {vote_average}/10  \n**Genres:** {genres}""")
                                     st.markdown("")
-        st.markdown("###### Created by [Sebastian Montero](http://www.sebastianmontero.com/)")
+        st.markdown("**Created by [Sebastian Montero](http://www.sebastianmontero.com/)**")
 
 
 if __name__ == "__main__":
