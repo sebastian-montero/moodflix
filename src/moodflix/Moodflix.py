@@ -38,7 +38,7 @@ class Main:
         st.columns([1, 3, 1])[1].markdown(center_html("h3", "A movie recommendation engine in tune with your mood 🍿"), unsafe_allow_html=True)
 
         with st.sidebar:
-            st.markdown(center_html("p", img_to_html("im_pop.png", 200)), unsafe_allow_html=True)
+            st.markdown(center_html("p", img_to_html("im_pop.png", 250)), unsafe_allow_html=True)
             st.markdown(ABOUT)
             with st.expander("Additional parameters", expanded=False):
                 if "k" not in st.session_state:
