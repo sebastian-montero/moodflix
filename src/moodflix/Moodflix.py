@@ -24,6 +24,7 @@ class Movie:
     tagline: str
     vote_average: float
     genres: list
+    original_language: str
 
 
 class Main:
@@ -86,6 +87,7 @@ class Main:
                         title = movie.name
                         overview = movie.overview
                         vote_average = movie.vote_average
+                        language = movie.original_language
                         release_date = int(movie.release_date[0:4]) if isinstance(movie.release_date, str) else "N/A"
 
                         len_movie_genre = len([x for x in movie.genres if x in all_genres])
@@ -100,7 +102,7 @@ class Main:
                                 st.markdown(f"**Plot synopsis:** {overview}")
                             with movie_column2:
                                 genres_str = ", ".join(movie.genres)
-                                st.markdown(f"""**Rating:** {vote_average}/10  \n**Genres:** {genres_str}""")
+                                st.markdown(f"""**Rating:** {vote_average}/10  \n**Genres:** {genres_str}  \n**Language:** {language}""")
                             st.divider()
 
         st.markdown(center_html("p", "Created by <a href=https://twitter.com/sebastianmxnt>Sebastian Montero</a>"), unsafe_allow_html=True)
