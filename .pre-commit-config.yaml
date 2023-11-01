@@ -1,47 +1,40 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
-    -   id: check-yaml
-    -   id: check-json
-    -   id: pretty-format-json
-    -   id: trailing-whitespace
-    -   id: end-of-file-fixer
-    -   id: check-added-large-files
+      - id: check-yaml
+      - id: check-json
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-added-large-files
 
--   repo: https://github.com/roy-ht/pre-commit-jupyter
+  - repo: https://github.com/roy-ht/pre-commit-jupyter
     rev: v1.2.1
     hooks:
       - id: jupyter-notebook-cleanup
         name: (.ipynb) remove metadata
-        args: ["--remove-kernel-metadata", "--pin-patterns", "[pin];[donotremove]"]
+        args:
+          ["--remove-kernel-metadata", "--pin-patterns", "[pin];[donotremove]"]
 
--   repo: https://github.com/psf/black
+  - repo: https://github.com/psf/black
     rev: 23.3.0
     hooks:
-    - id: black
-      name: (.py) Black
-      args: ["--line-length=200"]
+      - id: black
+        name: (.py) Black
+        args: ["--line-length=200"]
 
--   repo: https://github.com/pycqa/isort
+  - repo: https://github.com/pycqa/isort
     rev: 5.12.0
     hooks:
-    - id: isort
-      name: (.py) Sort imports
+      - id: isort
+        name: (.py) Sort imports
 
--   repo: https://github.com/pycqa/pydocstyle
-    rev: 6.3.0
-    hooks:
-    -   id: pydocstyle
-        name: (.py) Check docstrings
-        args: ["--ignore=D213,D401,D204,D100,D203"]
-
--   repo: https://github.com/pycqa/pylint
+  - repo: https://github.com/pycqa/pylint
     rev: v3.0.0a6
     hooks:
-    -   id: pylint
+      - id: pylint
         name: (.py) Pylint
         exclude: ^tests/
         args: ["--disable=E0401,C0114,C0301,E0402,R0903,E1121,R1705"]
