@@ -63,7 +63,7 @@ class Main:
             if st.button("🎲"):
                 random_mood = random.choice(MOODS)
 
-        st.session_state.mood = st.text_area("enter_mood", label_visibility="collapsed", value=random_mood, placeholder="click 🎲 to get a random mood", height=50)
+        st.session_state.mood = st.text_input("mood", label_visibility="collapsed", value=random_mood, placeholder="click 🎲 to get a random mood")
 
         if st.session_state.mood != "":
             with st.spinner("🍿"):
