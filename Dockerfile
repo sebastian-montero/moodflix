@@ -9,14 +9,14 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-COPY . /app
+COPY . .
 
+ENV PIP_DEFAULT_TIMEOUT=300
 RUN pip3 install poetry
-RUN poetry export -f requirements.txt --output requirements.txt
-RUN pip3 install -r requirements.txt
+RUN poetry install -v
 
 EXPOSE 8501
 
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
-ENTRYPOINT ["streamlit", "run", "app/src/moodflix/Moodflix.py", "--server.port=8501", "--server.address=0.0.0.0"]
+ENTRYPOINT ["poetry", "run", "streamlit", "run", "/app/src/moodflix/Moodflix.py", "--server.port=8501", "--server.address=0.0.0.0"]
