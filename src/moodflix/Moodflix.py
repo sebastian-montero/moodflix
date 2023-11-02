@@ -30,13 +30,15 @@ class Movie:
 class Main:
     """Main class for the app"""
 
-    # pylint: disable=too-many-locals,too-many-statements
     @staticmethod
-    def render():
-        """Renders the app"""
+    def render_header():
+        """Renders the header"""
         st.markdown(center_html("p", img_to_html("im_logo.png", 300)), unsafe_allow_html=True)
         st.columns([1, 3, 1])[1].markdown(center_html("h3", "A movie recommendation engine in tune with your mood."), unsafe_allow_html=True)
 
+    @staticmethod
+    def render_sidebar():
+        """Renders the sidebar"""
         with st.sidebar:
             st.markdown(center_html("p", img_to_html("im_pop.png", 125)), unsafe_allow_html=True)
             st.markdown(ABOUT)
@@ -44,6 +46,11 @@ class Main:
                 if "k" not in st.session_state:
                     st.session_state.k = 50
                 st.session_state.k = st.number_input("Approximate nearest neighbours to search", min_value=5, max_value=200, value=st.session_state.k, step=10)
+
+    # pylint: disable=too-many-locals,too-many-statements
+    @staticmethod
+    def render():
+        """Renders the app"""
 
         index = load_index()
         movies = load_data()
@@ -63,7 +70,12 @@ class Main:
             if st.button("🎲"):
                 random_mood = random.choice(MOODS)
 
-        st.session_state.mood = st.text_input("mood", label_visibility="collapsed", value=random_mood, placeholder="click 🎲 to get a random mood")
+        st.session_state.mood = st.text_input(
+            "mood",
+            label_visibility="collapsed",
+            value=random_mood,
+            placeholder="click 🎲 to get random moods",
+        )
 
         if st.session_state.mood != "":
             with st.spinner("🍿"):
@@ -74,9 +86,9 @@ class Main:
                 all_genres = {j for s in [movies[i]["genres"] for i in movie_ids] for j in s}
 
                 with st.expander("Filters", expanded=False):
+                    ranking_filter = st.slider("Rating", min_value=0, max_value=10, value=(0, 10))
                     genre_filter = st.multiselect("Genres", options=all_genres, default=all_genres)
-                    genre_excluded = st.toggle("Hard exclude", value=True)
-                    ranking_filter = st.slider("Rating", min_value=0, max_value=10, value=(0, 10), step=1)
+                    genre_excluded = st.toggle("Exclude", value=True)
 
                 st.markdown("#### Here's what we recommend:")
                 st.markdown("")
@@ -105,8 +117,15 @@ class Main:
                                 st.markdown(f"""**Rating:** {vote_average}/10  \n**Genres:** {genres_str}  \n**Language:** {language}""")
                             st.divider()
 
+    @staticmethod
+    def render_footer():
+        """Renders the footer"""
+        st.markdown("")
         st.markdown(center_html("p", "Created by <a href=https://twitter.com/sebastianmxnt>Sebastian Montero</a>"), unsafe_allow_html=True)
 
 
 if __name__ == "__main__":
+    Main.render_header()
+    Main.render_sidebar()
     Main.render()
+    Main.render_footer()
