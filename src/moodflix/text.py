@@ -36,11 +36,11 @@ So, taking a cue from Viberary, Moodflix was born, aiming to match movies with m
 ## The Data
 The dataset provides metadata about the top 10,000 movies from **The Movie Database (TMDB)**. Encompassing a diverse set of attributes, details such as movie titles, release dates, runtime, genres, production companies, budget, and revenue are included. Key attributes highlighted are the unique identifier (`id`), movie title (`title`), associated genres (`genres`), the original production language (`original_language`), average user rating (`vote_average`), a popularity score based on user engagement (`popularity`), a brief synopsis (`overview`), the production budget in USD (`budget`), the movie's total revenue in USD (`revenue`), the movie's duration in minutes (`runtime`), and its promotional tagline (`tagline`). This data, sourced from TMDB, was retrieved from Kaggle and has been processed for enhanced quality and usability.
 
-**Source:** [Top 10000 popular Movies TMDB](#https://www.kaggle.com/datasets/ursmaheshj/top-10000-popular-movies-tmdb-05-2023)
+**Source:** [Top 10000 popular Movies TMDB](https://www.kaggle.com/datasets/ursmaheshj/top-10000-popular-movies-tmdb-05-2023)
 
 ## Indexing the movies
 The ingestion pipelines processes the data and prepares it for similarity-based recommendations.
-It utilizes the `sentence-t5-base` model from SentenceTransformers to convert textual information from movie titles, genres, overviews, and taglines into numerical embeddings.
+It utilizes the `sentence-t5-large` model from SentenceTransformers to convert textual information from movie titles, genres, overviews, and taglines into numerical embeddings.
 These embeddings serve as condensed representations, capturing the content nuances of each film, facilitating efficient similarity comparisons.
 
 To enable rapid similarity searches, the we use the `hnswlib` library to create a search index based on the HNSW (Hierarchical Navigable Small World) algorithm.
