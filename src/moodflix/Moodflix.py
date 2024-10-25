@@ -121,7 +121,7 @@ class Main:
     def render_footer():
         """Renders the footer"""
         st.markdown("")
-        st.markdown(center_html("p", "Created by <a href=https://twitter.com/sebastianmxnt>Sebastian Montero</a>"), unsafe_allow_html=True)
+        st.markdown(center_html("p", "Created by <a href=https://seb.incendia.dev/>Sebastian Montero</a>"), unsafe_allow_html=True)
 
 
 if __name__ == "__main__":

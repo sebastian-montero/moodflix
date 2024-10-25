@@ -28,11 +28,6 @@ Ever had one of those days where you're thinking, "I'm feeling so blue, a rom-co
 Get tailored recommendations based on your current feels. Say goodbye to endless scrolling and hello to the ideal movie match.
 Whether you're in the mood for some drama, thrills, or romance, Moodflix is your new best cinema friend. Let's get those movie vibes going!
 
-## Inspiration
-The idea behind Moodflix was sparked by the [Viberary](http://viberary.pizza) website, created by [@vboykis](https://twitter.com/vboykis).
-Viberary uses a similar approach of suggesting books based on the user's vibes. Seeing its potential, I felt a similar concept could be applied to movies.
-So, taking a cue from Viberary, Moodflix was born, aiming to match movies with moods for a tailored viewing experience.
-
 ## The Data
 The dataset provides metadata about the top 10,000 movies from **The Movie Database (TMDB)**. Encompassing a diverse set of attributes, details such as movie titles, release dates, runtime, genres, production companies, budget, and revenue are included. Key attributes highlighted are the unique identifier (`id`), movie title (`title`), associated genres (`genres`), the original production language (`original_language`), average user rating (`vote_average`), a popularity score based on user engagement (`popularity`), a brief synopsis (`overview`), the production budget in USD (`budget`), the movie's total revenue in USD (`revenue`), the movie's duration in minutes (`runtime`), and its promotional tagline (`tagline`). This data, sourced from TMDB, was retrieved from Kaggle and has been processed for enhanced quality and usability.
 
