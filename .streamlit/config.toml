@@ -3,3 +3,10 @@ primaryColor="#DA2C38"
 backgroundColor="#F4F9E9"
 secondaryBackgroundColor="#FAFFF0"
 textColor="#0B0014"
+
+[server]
+enableCORS = false
+enableWebsocketCompression = false
+headless = true
+port = 8501  # Change if your app runs on a different port
+
