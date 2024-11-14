@@ -28,6 +28,3 @@ Upon receiving the user's mood input, we encode the text into a numerical vector
 This embedding is essentially a dense vector that captures the essence of the user's mood in a format conducive to similarity comparisons.
 The generated embedding is then used as a search query in the `hnswlib` index to perform a k-nearest neighbors search.
 This search retrieves movies with embeddings that are most similar to the mood embedding, ensuring that the movies align closely with the user's specified mood.
-
-![img](./im_pop.png)
-
