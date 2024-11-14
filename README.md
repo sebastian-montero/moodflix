@@ -1,5 +1,6 @@
 # Moodflix
 
+![logo](./im_logo.png)
 
 Ever had one of those days where you're thinking, "I'm feeling so blue, a rom-com is just the thing," or "I'm on top of the world, bring on the action"? Well, Moodflix is here to save your movie night.
 Get tailored recommendations based on your current feels. Say goodbye to endless scrolling and hello to the ideal movie match.
